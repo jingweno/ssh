@@ -1,7 +1,6 @@
 package ssh
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"net"
@@ -127,21 +126,22 @@ type session struct {
 	breakCh           chan<- bool
 }
 
-func (sess *session) Write(p []byte) (n int, err error) {
-	if sess.pty != nil {
-		m := len(p)
-		// normalize \n to \r\n when pty is accepted.
-		// this is a hardcoded shortcut since we don't support terminal modes.
-		p = bytes.Replace(p, []byte{'\n'}, []byte{'\r', '\n'}, -1)
-		p = bytes.Replace(p, []byte{'\r', '\r', '\n'}, []byte{'\r', '\n'}, -1)
-		n, err = sess.Channel.Write(p)
-		if n > m {
-			n = m
-		}
-		return
-	}
-	return sess.Channel.Write(p)
-}
+// TODO: the following breaks tmux
+//func (sess *session) Write(p []byte) (n int, err error) {
+////if sess.pty != nil {
+////m := len(p)
+////// normalize \n to \r\n when pty is accepted.
+////// this is a hardcoded shortcut since we don't support terminal modes.
+////p = bytes.Replace(p, []byte{'\n'}, []byte{'\r', '\n'}, -1)
+////p = bytes.Replace(p, []byte{'\r', '\r', '\n'}, []byte{'\r', '\n'}, -1)
+////n, err = sess.Channel.Write(p)
+////if n > m {
+////n = m
+////}
+////return
+////}
+//return sess.Channel.Write(p)
+//}
 
 func (sess *session) PublicKey() PublicKey {
 	sessionkey := sess.ctx.Value(ContextKeyPublicKey)
